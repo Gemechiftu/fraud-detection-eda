@@ -1,0 +1,19 @@
+import pandas as pd
+import ipaddress
+
+def ip_to_int(ip_str):
+    return int(ipaddress.IPv4Address(ip_str))
+
+def merge_ip_country(df, ip_df):
+    df['ip_int'] = df['ip_address'].apply(ip_to_int)
+    ip_df['lower_bound_int'] = ip_df['lower_bound_ip_address'].apply(ip_to_int)
+    ip_df['upper_bound_int'] = ip_df['upper_bound_ip_address'].apply(ip_to_int)
+
+    def find_country(ip_int):
+        match = ip_df[(ip_df['lower_bound_int'] <= ip_int) & (ip_df['upper_bound_int'] >= ip_int)]
+        if not match.empty:
+            return match.iloc[0]['country']
+        return 'Unknown'
+
+    df['ip_country'] = df['ip_int'].apply(find_country)
+    return df

@@ -1,0 +1,18 @@
+import pandas as pd
+
+def preprocess_data(fraud_data_path, ip_data_path):
+    df = pd.read_csv(fraud_data_path)
+    ip_df = pd.read_csv(ip_data_path)
+
+    # Convert timestamps
+    df['signup_time'] = pd.to_datetime(df['signup_time'])
+    df['purchase_time'] = pd.to_datetime(df['purchase_time'])
+
+    # Feature: time since signup
+    df['time_since_signup'] = (df['purchase_time'] - df['signup_time']).dt.total_seconds()
+
+    # Feature: hour and weekday
+    df['hour_of_day'] = df['purchase_time'].dt.hour
+    df['day_of_week'] = df['purchase_time'].dt.dayofweek
+
+    return df, ip_df
